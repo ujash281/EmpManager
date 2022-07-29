@@ -45,7 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.csrf()
 		.disable()
 		.authorizeHttpRequests()
-		
+		//.antMatchers("/getAllComplaints").hasAnyRole("ROLE_USER", "ROLE_ADMIN")
+		.antMatchers("/api/auth/**").permitAll()
 		.anyRequest()
 		.authenticated()
 		.and()
@@ -68,10 +69,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new BCryptPasswordEncoder();
 	}
 
+	
+	
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
+	
 	
 }

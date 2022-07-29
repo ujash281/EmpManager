@@ -1,8 +1,6 @@
 package com.empmng.services;
 
-import java.util.List;
 
-import org.springframework.data.domain.Page;
 
 import com.empmng.entities.Employee;
 
@@ -11,5 +9,9 @@ import com.empmng.entities.Employee;
 public interface EmpServices {
 
 	Employee saveEmployee(Employee employee);
+	
+	Employee getEmployee(Integer empId);
+
+	Employee updateEmp(Employee employee, Integer empId);
 	
 }

@@ -1,27 +1,36 @@
 package com.empmng.controller;
 
+import java.util.Optional;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.empmng.entities.Employee;
 import com.empmng.exception.ApiException;
 import com.empmng.payloads.JwtAuthRequest;
 import com.empmng.payloads.JwtAuthResponse;
+import com.empmng.repo.EmpRepo;
 import com.empmng.security.JwtTokenHelper;
 import com.empmng.services.EmpServices;
 
 @RestController
 @RequestMapping("/api/auth/")
+@CrossOrigin
 public class AuthController {
 
 	@Autowired
@@ -35,6 +44,9 @@ public class AuthController {
 	
 	@Autowired
 	private EmpServices empServices;
+	
+	@Autowired
+	private EmpRepo empRepo;
 	
 	@PostMapping("/login")
 	public ResponseEntity<JwtAuthResponse> createToken(
@@ -66,10 +78,18 @@ public class AuthController {
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<Employee> registerUser(@RequestBody Employee employee){
+	public ResponseEntity<?> registerUser(@Valid @RequestBody Employee employee){
+		 Employee email = this.empRepo.findByEmail(employee.getEmail());
+		   if(email!=null) {
+			   return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body("{\"error\":\"User already exitst\"}");
+			
+		   }else {
+			
+			   Employee registeredUser = this.empServices.saveEmployee(employee);
+				return new ResponseEntity<Employee>(registeredUser , HttpStatus.CREATED);
+		}
+		    
 		
-		Employee registeredUser = this.empServices.saveEmployee(employee);
-		return new ResponseEntity<Employee>(registeredUser , HttpStatus.CREATED);
 	}
  	
 }
